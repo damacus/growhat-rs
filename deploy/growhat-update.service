@@ -1,0 +1,20 @@
+[Unit]
+Description=Check for a stable Grow HAT release and update atomically
+Wants=network-online.target
+After=network-online.target growhat.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/growhat-update
+User=root
+Group=root
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadWritePaths=/opt/growhat /run/lock
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+UMask=0022

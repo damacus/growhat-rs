@@ -1,0 +1,12 @@
+[Unit]
+Description=Periodically check for Grow HAT releases
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=6h
+RandomizedDelaySec=30min
+Persistent=true
+Unit=growhat-update.service
+
+[Install]
+WantedBy=timers.target

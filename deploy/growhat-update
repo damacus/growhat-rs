@@ -1,0 +1,119 @@
+#!/usr/bin/python3
+"""Install the latest stable public Grow HAT release, with checksum and rollback."""
+
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import tempfile
+import time
+from urllib.request import Request, urlopen
+
+REPOSITORY = "damacus/growhat-rs"
+API = f"https://api.github.com/repos/{REPOSITORY}/releases/latest"
+BINARY_ASSET = "growhat-armv6-linux-gnueabihf"
+INSTALL = Path("/opt/growhat/growhat")
+CONFIG = Path("/etc/growhat/config.toml")
+LOCK = Path("/run/lock/growhat-update.lock")
+
+
+def fetch(url):
+    request = Request(url, headers={"Accept": "application/vnd.github+json",
+                                    "User-Agent": "growhat-release-updater"})
+    with urlopen(request, timeout=30) as response:
+        return response.read()
+
+
+def run(args, **kwargs):
+    return subprocess.run(args, check=True, text=True, capture_output=True, **kwargs)
+
+
+def service_healthy(previous_restarts):
+    deadline = time.monotonic() + 30
+    stable_since = None
+    while time.monotonic() < deadline:
+        active = subprocess.run(["systemctl", "is-active", "--quiet", "growhat.service"]).returncode == 0
+        restarts = run(["systemctl", "show", "-p", "NRestarts", "--value", "growhat.service"]).stdout.strip()
+        if active and restarts == previous_restarts:
+            stable_since = stable_since or time.monotonic()
+            if time.monotonic() - stable_since >= 10:
+                return True
+        else:
+            stable_since = None
+        time.sleep(1)
+    return False
+
+
+def update():
+    LOCK.parent.mkdir(parents=True, exist_ok=True)
+    with LOCK.open("w") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print("Another Grow HAT update is running; skipping")
+            return
+
+        release = json.loads(fetch(API))
+        if release.get("draft") or release.get("prerelease"):
+            raise RuntimeError("GitHub latest endpoint returned a non-stable release")
+        tag = release.get("tag_name", "")
+        if not re.fullmatch(r"v\d+\.\d+\.\d+", tag):
+            raise RuntimeError(f"Unexpected release tag: {tag!r}")
+        version = tag[1:]
+        assets = {asset["name"]: asset["browser_download_url"] for asset in release["assets"]}
+        if BINARY_ASSET not in assets or "SHA256SUMS" not in assets:
+            raise RuntimeError("Release is missing the binary or its checksum manifest")
+        manifest = fetch(assets["SHA256SUMS"]).decode("ascii")
+        match = re.search(rf"^([0-9a-f]{{64}})\s+\*?{re.escape(BINARY_ASSET)}$", manifest, re.M)
+        if not match:
+            raise RuntimeError("Checksum manifest has no entry for the Pi binary")
+        current = run([str(INSTALL), "--version"]).stdout.strip()
+        if current.endswith(version):
+            print(f"Already running {tag}")
+            return
+
+        binary = fetch(assets[BINARY_ASSET])
+        if hashlib.sha256(binary).hexdigest() != match.group(1):
+            raise RuntimeError("Downloaded Pi binary failed SHA-256 verification")
+
+        INSTALL.parent.mkdir(parents=True, exist_ok=True)
+        fd, candidate_name = tempfile.mkstemp(prefix=".growhat-new-", dir=INSTALL.parent)
+        candidate = Path(candidate_name)
+        backup = INSTALL.with_name("growhat.previous")
+        try:
+            installed_stat = INSTALL.stat()
+            with os.fdopen(fd, "wb") as stream:
+                stream.write(binary)
+                stream.flush()
+                os.fsync(stream.fileno())
+            candidate.chmod(installed_stat.st_mode & 0o777)
+            os.chown(candidate, installed_stat.st_uid, installed_stat.st_gid)
+            candidate_version = run([str(candidate), "--version"]).stdout.strip()
+            if not candidate_version.endswith(version):
+                raise RuntimeError(f"Downloaded binary reports {candidate_version!r}, expected {version}")
+            run(["runuser", "-u", "growhat", "--", str(candidate), "--config", str(CONFIG), "check-config"])
+
+            previous_restarts = run(["systemctl", "show", "-p", "NRestarts", "--value", "growhat.service"]).stdout.strip()
+            backup.unlink(missing_ok=True)
+            os.link(INSTALL, backup)
+            os.replace(candidate, INSTALL)
+            subprocess.run(["systemctl", "restart", "growhat.service"], check=False)
+            if not service_healthy(previous_restarts):
+                os.replace(backup, INSTALL)
+                subprocess.run(["systemctl", "restart", "growhat.service"], check=False)
+                raise RuntimeError(f"{tag} did not start cleanly; restored the previous executable")
+            print(f"Updated Grow HAT to {tag}")
+        finally:
+            candidate.unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
+    try:
+        update()
+    except Exception as error:  # systemd records the error for diagnostics
+        print(f"Grow HAT update failed: {error}", file=sys.stderr)
+        sys.exit(1)

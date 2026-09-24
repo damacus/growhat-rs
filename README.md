@@ -1,6 +1,6 @@
 # growhat
 
-An independent, unofficial Rust port for the Pimoroni Grow HAT Mini. This project is not affiliated with, endorsed by or supported by Pimoroni. It reads moisture-probe pulse frequencies and publishes raw readings, calibrated moisture and health to Home Assistant over MQTT. Optional display and button support provides local readings and temporary test messages. Pump 1 accepts bounded manual CLI and authenticated MQTT pulse requests; automatic watering is disabled.
+An independent, unofficial Rust port for the Pimoroni Grow HAT Mini. This repository is not associated with Pimoroni in any way and is not affiliated with, endorsed by, supported by, or maintained by them. It reads moisture-probe pulse frequencies and publishes raw readings, calibrated moisture and health to Home Assistant over MQTT. Optional display and button support provides local readings and temporary test messages. Pump 1 accepts bounded manual CLI and authenticated MQTT pulse requests; automatic watering is disabled.
 
 ## Why Rust
 
@@ -155,5 +155,13 @@ Messages accept printable ASCII and newlines, fitting five lines of 24 character
 `deploy/growhat.service` expects the binary at `/opt/growhat/growhat`, configuration at `/etc/growhat/config.toml`, and a `growhat` system user with membership of the Pi's `gpio` and `spi` groups. Create that user, install the release binary/configuration and copy the unit into `/etc/systemd/system/`. The unit permits `/dev/gpiochip0` and `/dev/spidev0.0`; adjust its `DeviceAllow` if the verified GPIO chip differs. Keep credentials readable only by the service user.
 
 Then validate the unit with `systemd-analyze verify`, reload systemd and enable/start `growhat.service`. These are commissioning steps; the development smoke command performs none of them. Check logs with `journalctl -u growhat.service`. Preserve the last working executable before upgrading; stop the service and restore it if a release fails.
+
+## Release updates
+
+GitHub Actions runs formatting, Rust tests, Clippy, MQTT integration checks and an ARMv6/glibc 2.28 cross-build. A `vX.Y.Z` tag matching the version in `Cargo.toml` creates a stable GitHub release containing the Pi executable and `SHA256SUMS`. The workflow publishes no Rust libraries or build dependencies to the device.
+
+To enable automatic updates, install `deploy/growhat-update` at `/usr/local/sbin/growhat-update` as root-owned mode `0755`, and install `deploy/growhat-update.service` and `deploy/growhat-update.timer` under `/etc/systemd/system/`. Then run `sudo systemctl daemon-reload && sudo systemctl enable --now growhat-update.timer`. The timer checks GitHub's latest stable release about every six hours. The updater verifies the checksum, confirms the candidate version and checks the device configuration, then atomically replaces the executable and restarts `growhat.service`. If the service does not stay healthy, it restores the previous executable. It downloads only the executable and checksum file; no crates or runtime libraries are installed. The updater runs as root so it can replace the service binary. SHA-256 detects a corrupt or mismatched download but does not independently authenticate the publisher.
+
+To make a release, change the package version in `Cargo.toml`, commit that change on `main`, and push a matching annotated tag (for example, `v0.2.0`). The release job runs only after all CI and the ARMv6 build pass. The device follows stable releases, rather than arbitrary commits on `main`.
 
 Buzzer, light sensor and watering are deferred. Ordinary local tests use simulation and do not access hardware.
