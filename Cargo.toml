@@ -1,0 +1,29 @@
+[package]
+name = "growhat"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Sensor-only Grow HAT Mini controller with MQTT discovery"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+rumqttc = { version = "0.25", default-features = false }
+tokio = { version = "1", features = ["rt", "macros", "time", "signal", "sync"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gpiocdev = "0.7"
+libc = "0.2"
+
+[profile.release]
+strip = "debuginfo"
+
+# Keep incremental, unoptimised builds for the feedback loop, without sending
+# tens of megabytes of debug information over the Zero's wireless connection.
+[profile.pi-dev]
+inherits = "dev"
+debug = 0
+strip = "debuginfo"

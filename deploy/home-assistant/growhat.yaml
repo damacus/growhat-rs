@@ -1,0 +1,14 @@
+# Install as /config/packages/growhat.yaml when Home Assistant has
+# homeassistant.packages: !include_dir_named packages.
+script:
+  growhat_pump_1s:
+    alias: Grow HAT pump 1 - 50% for 1 second
+    icon: mdi:pump
+    mode: single
+    sequence:
+      - action: mqtt.publish
+        data:
+          topic: growhat/grow_pi_zero_w/pump/set
+          payload: !secret growhat_pump_1s_payload
+          qos: 1
+          retain: false

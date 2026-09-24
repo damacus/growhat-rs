@@ -1,0 +1,9 @@
+/target/
+/.tools/
+/.local/
+/.superpowers/
+/.serena/
+/config.local.toml
+*.credentials
+__pycache__/
+/tmp/

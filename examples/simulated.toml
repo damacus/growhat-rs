@@ -1,0 +1,10 @@
+device_id = "growhat_demo"
+name = "Grow HAT demo"
+backend = "simulated"
+sample_interval_ms = 1000
+stale_after_ms = 5000
+
+[[sensors]]
+channel = 1
+name = "Soil 1"
+simulated_hz = 10.0

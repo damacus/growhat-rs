@@ -1,0 +1,38 @@
+device_id = "growhat_pi"
+name = "Grow HAT Mini"
+backend = "hardware"
+hardware_confirmed = false
+# Enable only after confirming the Grow HAT Mini display/button wiring.
+panel_enabled = false
+gpio_chip = "/dev/gpiochip0"
+
+[[sensors]]
+channel = 1
+name = "Soil 1"
+
+[[sensors]]
+channel = 2
+name = "Soil 2"
+
+[[sensors]]
+channel = 3
+name = "Soil 3"
+
+# Manual pump control is disabled until the pump, water path and limits are checked.
+# [pump]
+# enabled = true
+# channels = [1]
+# max_duration_ms = 5000
+# max_total_ms_per_24h = 30000
+# Set true only for supervised local CLI debugging. The local CLI bypasses the
+# configured per-pulse and daily limits, with a five-minute hard cutoff. MQTT
+# retains both configured limits.
+# debug_mode = false
+# state_file = "/var/lib/growhat/pump-state.json"
+# mqtt_token_file = "/etc/growhat/pump-mqtt.token"
+
+[mqtt]
+host = "mosquitto.ironstone.casa"
+port = 1883
+topic_prefix = "growhat"
+discovery_prefix = "homeassistant"

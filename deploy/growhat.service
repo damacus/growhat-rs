@@ -1,0 +1,32 @@
+[Unit]
+Description=Grow HAT Mini moisture sensors, buttons and display
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=growhat
+Group=growhat
+SupplementaryGroups=gpio spi
+ExecStart=/opt/growhat/growhat --config /etc/growhat/config.toml run
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+StateDirectory=growhat
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+DevicePolicy=closed
+DeviceAllow=/dev/gpiochip0 rw
+DeviceAllow=/dev/spidev0.0 rw
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
