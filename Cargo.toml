@@ -15,7 +15,7 @@ rumqttc = { version = "0.25", default-features = false }
 tokio = { version = "1", features = ["rt", "macros", "time", "signal", "sync"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
-gpiocdev = "0.7"
+gpiocdev = "0.8"
 libc = "0.2"
 
 [profile.release]
