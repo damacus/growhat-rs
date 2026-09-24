@@ -35,6 +35,9 @@ jobs:
         with:
           toolchain: 1.98.1
           target: arm-unknown-linux-gnueabihf
+          # Zig emits a deprecated-linker-option diagnostic for ARMv6; keep
+          # it visible without treating that external linker message as fatal.
+          build-warnings: warn
       - name: Install pinned ARMv6 cross-linker
         run: python3 -m venv .ci && .ci/bin/pip install ziglang==0.13.0 cargo-zigbuild==0.20.1
       - name: Add Zig to PATH
