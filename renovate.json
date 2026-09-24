@@ -4,6 +4,11 @@
     "local>damacus/renovate-config"
   ],
   "minimumReleaseAge": "2 days",
+  "minimumReleaseAgeBehaviour": "timestamp-required",
+  "dependencyDashboard": true,
+  "prCreation": "not-pending",
+  "internalChecksFilter": "strict",
+  "internalChecksAsSuccess": true,
   "automerge": true,
   "automergeType": "pr",
   "platformAutomerge": false
