@@ -2,6 +2,10 @@
 
 Measured on 22 September 2026 on `pi@192.168.1.216`, the Pi Zero W Rev 1.1. Python was measured and backed up before either existing service was disabled.
 
+This is a historical handover record. The observations and rollback paths below
+describe that deployment, not the current live state. See [release updates](releases.md)
+for the current upgrade workflow.
+
 ## Baseline
 
 The existing `grow-hat-input-test.service` ran `/home/pi/grow-display-test/input_test.py`. It counted moisture edges on BCM23/8/25, refreshed the display every 250ms, read the light sensor every 500ms and handled four buttons. It rewrote `input-status.json` each display frame. `grow-dashboard-mqtt.service` read that file every 100ms and published to the existing MQTT broker every five seconds or on button changes.

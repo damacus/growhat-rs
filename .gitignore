@@ -7,3 +7,6 @@
 *.credentials
 __pycache__/
 /tmp/
+
+/site/
+/.cache/

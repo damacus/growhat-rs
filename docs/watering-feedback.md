@@ -4,9 +4,11 @@ The Grow moisture probes report pulse frequency: lower Hz means wetter soil. The
 
 Before enabling closed-loop watering, measure a dry reference and a wet-enough target for sensor 1 in its planted position. Keep the sensor away from the direct water stream. Record the actual mass delivered by each pump pulse and how long the sensor takes to respond. The observed pump flow near 50% was approximately 11.3 g/s in one trial; use the scale again because tubing prime and head height change delivery.
 
-The read-only monitor can run on the Mac while the existing service stays on the Pi:
+The read-only monitor can run on the development host while the existing service stays on the Pi.
+Run [development setup](development.md) first and create the ignored output directory:
 
 ```sh
+mkdir -p .local
 .tools/bin/python scripts/water_feedback.py --channel 1 --seconds 300 > .local/water-trial.csv
 ```
 

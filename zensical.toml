@@ -1,0 +1,42 @@
+[project]
+site_name = "Growhat"
+site_description = "Rust controller for the Pimoroni Grow HAT Mini"
+site_url = "https://damacus.github.io/growhat-rs/"
+repo_url = "https://github.com/damacus/growhat-rs"
+edit_uri = "edit/main/docs/"
+docs_dir = "docs"
+site_dir = "site"
+strict = true
+nav = [
+  { "Home" = "index.md" },
+  { "Getting started" = [
+    { "Hardware" = "hardware.md" },
+    { "Sensors" = "sensors.md" },
+    { "MQTT and Home Assistant" = "mqtt.md" },
+    { "Service installation" = "installation.md" },
+  ] },
+  { "Operation" = [
+    { "Manual pumps" = "pumps.md" },
+    { "Display and buttons" = "display.md" },
+    { "Watering feedback" = "watering-feedback.md" },
+    { "Release updates" = "releases.md" },
+  ] },
+  { "Development" = [
+    { "Development workflow" = "development.md" },
+    { "Testing" = "testing.md" },
+  ] },
+  { "Historical records" = [
+    { "Validation" = "validation.md" },
+    { "Python baseline" = "python-rust-baseline.md" },
+    { "Original implementation plan" = "implementation-plan.md" },
+  ] },
+]
+
+[project.theme]
+custom_dir = "overrides"
+language = "en"
+features = ["navigation.sections", "navigation.top", "search.highlight", "content.code.copy"]
+
+[project.validation]
+invalid_links = true
+invalid_link_anchors = true

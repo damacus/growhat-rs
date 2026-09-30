@@ -2,6 +2,9 @@
 
 Recorded during implementation on 22 September 2026. This separates software checks from physical commissioning.
 
+Follow-up entries are dated below. They record observations at the time and do not
+claim current live state. See [testing](testing.md) for the current verification workflow.
+
 ## Display/button follow-up
 
 The user subsequently requested restoration of buttons and MQTT test messages on the LCD. The optional `panel_enabled` implementation is complete locally: 28 Rust tests pass, Clippy with warnings denied passes, and the ARMv6 release cross-build succeeds. The panel settings and orientation were compared with the archived working ST7735 Python driver. Tests cover initial button snapshots, debouncing, message layout/glyphs, command rejection, exact legacy Home Assistant discovery topics and reconnect snapshot coalescing. The local broker suite also checks rejection of display commands while the panel is disabled.
