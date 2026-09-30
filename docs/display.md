@@ -6,7 +6,9 @@ Set top-level `panel_enabled = true` in a confirmed hardware configuration. This
 
 The normal LCD header shows the Pi's IPv4 address and a rolling sample counter, for example `IP 192.168.1.216 #0042`. The address is selected from the default network route without DNS or an MQTT connection and is checked every five seconds. It shows `IP unavailable` when no address can be selected. Temporary display messages hide the header until they expire.
 
-The normal screen shows moisture readings, button press counts and a four-digit sample counter beside the IP address. The counter advances every sensor cycle even when rounded readings stay the same, making a stalled screen visible. Button states are debounced for 30ms; counts and the sample counter reset when the process restarts. Held-state and press-count entities use the original Python button entity identities, so they return under the same Home Assistant device. No watering action is bound to a button.
+The current renderer shows moisture readings, button press counts and a four-digit sample counter beside the IP address. It wraps from 9999 to 0000. The counter advances every sensor cycle even when rounded readings stay the same, making a stalled screen visible. Button states are debounced for 30ms; counts and the sample counter reset when the process restarts. Held-state and press-count entities use the original Python button entity identities, so they return under the same Home Assistant device. No watering action is bound to a button.
+
+The 24 September [Pi validation record](validation.md#display-freshness-follow-up-24-september-2026) reports a six-digit counter in that deployment's notes. The checked-in renderer formats four digits, and the record says physical LCD output had not been confirmed. It therefore cannot establish the displayed width on the deployed Pi.
 
 ## Remote button controls
 
