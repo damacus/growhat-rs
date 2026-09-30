@@ -1,5 +1,9 @@
 # Sensors first implementation
 
+Historical plan from 22 September 2026. This records the original sensor-only scope;
+it is not the current feature list or development workflow. See [development](development.md)
+and [manual pump commands](pumps.md) for current instructions.
+
 Implement the user-approved Grow plan: one Rust sensor-only application, native macOS tests, cached ARMv6 cross-build and bounded SSH smoke test on pi@192.168.1.213, calibrated and raw moisture readings, MQTT discovery/availability, examples and systemd packaging. No pumps or output GPIO. No live service replacement. No commit or publication required.
 
 ## Task 1: Sensor model, configuration and hardware
