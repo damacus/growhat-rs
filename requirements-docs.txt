@@ -8,5 +8,5 @@ pathspec==1.1.1
 Pygments==2.21.0
 pymdown-extensions==12.1
 PyYAML==6.0.3
-tomli==2.4.1
+tomli==2.5.0
 zensical==0.0.68
