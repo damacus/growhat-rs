@@ -5,7 +5,9 @@
   ],
   "minimumReleaseAge": "2 days",
   "minimumReleaseAgeBehaviour": "timestamp-required",
-  "dependencyDashboard": true,
+  "dependencyDashboard": {
+    "enabled": true
+  },
   "prCreation": "not-pending",
   "internalChecksFilter": "strict",
   "internalChecksAsSuccess": true,
